@@ -89,3 +89,14 @@ mergedInstances should have one element and its value should be like this
     }
 };
 ```
+
+There could be thousands of BaseInstances as unmergedInstances and dozens of mergeKeys from input for [GraphMerger](https://github.com/mohammad4x/GraphMerger/blob/main/GraphMerger.cs)'s Merge method. these instances could be entity or link.
+ 
+ **Notes** for link sources and targets:
+ 
+ *before merge* : Source and target entities are guaranteed to exist in the input list as a standalone EntityInstance.
+ 
+ *after merge* : The above rule must be considered for the result and every link's source and target should point to the final merged EntityInstance(if merged).
+ 
+ **P.S**
+ For simplicity, we don't merge any links. We assume all of the mergeKeys coming to the Merge method have an ElementId that only will be found in **EntityInstance**s

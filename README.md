@@ -64,6 +64,8 @@ var mergeKeys = new List<MergeKey>
             
 var mergedInstances = new GraphMerger().Merge(mergeKeys, new List<BaseInstance> { instance1, instance2 });
 ```
+These two instances would be merged because key attributes ids are 1 and 3, instance1 has <"David", "Paris"> and instance2 also has <"David", "Paris"> combination in them as key 
+attribute values which are nominated for merge.
 
 mergedInstances should have one element and its value should be like this
 ```csharp

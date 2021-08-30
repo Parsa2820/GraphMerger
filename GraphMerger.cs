@@ -24,10 +24,10 @@ namespace Merge
             {
                 if (mergeKeysByElementId.TryGetValue(unmergedInstance.ElementId, out var attributeIds))
                 {
+                    var attributeKeysValuesCount = 0;
+
                     foreach (var attribute in unmergedInstance.Attributes)
                     {
-                        var attributeKeysValuesCount = 0;
-
                         if (attributeIds.Contains(attribute.Id))
                         {
                             attributeKeysValuesCount += attribute.Values.Count;
@@ -36,7 +36,8 @@ namespace Merge
                             {
                                 if (uniqueValuesByAttributeId.TryGetValue(attribute.Id, out var uniqueValues))
                                 {
-                                    uniqueValues.Union(attribute.Values.ToHashSet());
+                                    var newValues = attribute.Values.ToHashSet();
+                                    keyUniqueValuesByAttributeIdByElementId[unmergedInstance.ElementId][attribute.Id] = uniqueValues.Union(newValues).ToHashSet();
                                 }
                                 else
                                 {
@@ -48,11 +49,11 @@ namespace Merge
                                 keyUniqueValuesByAttributeIdByElementId.Add(unmergedInstance.ElementId, new Dictionary<long, HashSet<string>> { { attribute.Id, attribute.Values.ToHashSet() } });
                             }
                         }
+                    }
 
-                        if (attributeKeysValuesCount == 0)
-                        {
-                            mergedInstances.Add(unmergedInstance);
-                        }
+                    if (attributeKeysValuesCount == 0)
+                    {
+                        mergedInstances.Add(unmergedInstance);
                     }
                 }
                 else
@@ -82,8 +83,9 @@ namespace Merge
 
                         if (sameInstances.Count != 0)
                         {
-                            mergedInstances.Add(UnionSameInstances(sameInstances));
-                            unmergedInstanceList.Except(sameInstances);
+                            var mergedInstance = UnionSameInstances(sameInstances);
+                            unmergedInstanceList.Add(mergedInstance);
+                            unmergedInstanceList = unmergedInstanceList.Except(sameInstances).ToList();
                         }
                     }
                 }
@@ -122,7 +124,7 @@ namespace Merge
                     else
                     {
                         var mergedAttribute = mergedInstance.Attributes.First(attributeInMergedInstance => attributeInMergedInstance.Id == attribute.Id);
-                        mergedAttribute.Values.Union(attribute.Values);
+                        mergedAttribute.Values = mergedAttribute.Values.Union(attribute.Values).ToList();
                     }
                 }
             }
